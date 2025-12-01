@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - master   # le pipeline se déclenche à chaque push sur la branche master
 
 jobs:
   placeholder:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Trigger fonctionne"
+      - run: echo "Trigger fonctionne"  # juste pour vérifier que le pipeline se lance
