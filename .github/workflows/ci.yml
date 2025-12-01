@@ -1,5 +1,6 @@
 name: CI/CD Pipeline
 
+# Étape 1 : Déclenchement (Trigger)
 on:
   push:
     branches:
@@ -10,3 +11,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Trigger fonctionne"  # juste pour vérifier que le pipeline se lance
+
+
+# Étape 2 : Test
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js (exemple si c'est un projet Node.js)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
