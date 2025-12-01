@@ -7,28 +7,29 @@ on:
       - master
 
 # 2️⃣ Jobs
+name: CI/CD Pipeline
+
+# 1️⃣ Trigger : le pipeline se lance automatiquement sur push dans master
+on:
+  push:
+    branches:
+      - master
+
+# 2️⃣ Jobs
 jobs:
   test:
-    runs-on: windows-latest  # Agent Windows pour ASP.NET
+    runs-on: ubuntu-latest
     steps:
-      # Étape 1 : Récupérer le code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Étape 2 : Installer .NET
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+      - name: Set up Node.js (exemple si c'est un projet Node.js)
+        uses: actions/setup-node@v3
         with:
-          dotnet-version: '7.0.x'  # Ajuste la version selon ton projet
+          node-version: '16'
 
-      # Étape 3 : Restaurer les dépendances de la solution
-      - name: Restore dependencies
-        run: dotnet restore PartsUnlimited.sln
+      - name: Install dependencies
+        run: npm install
 
-      # Étape 4 : Compiler la solution en Release
-      - name: Build solution
-        run: dotnet build PartsUnlimited.sln --configuration Release
-
-      # Étape 5 : Exécuter les tests unitaires
       - name: Run tests
-        run: dotnet test PartsUnlimited.sln --configuration Release --no-build
+        run: npm test
