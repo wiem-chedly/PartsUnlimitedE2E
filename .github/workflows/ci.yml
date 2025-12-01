@@ -4,3 +4,9 @@ on:
   push:
     branches:
       - master
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Trigger fonctionne"
