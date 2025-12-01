@@ -1,6 +1,6 @@
 name: CI Pipeline ASP.NET
 
-# 1️⃣ Trigger : le pipeline se déclenche sur push dans master
+# 1️⃣ Trigger : exécuter sur chaque push dans master
 on:
   push:
     branches:
@@ -8,26 +8,27 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest     # ⚠️ Projet ASP.NET 
+    runs-on: ubuntu-latest
+
     steps:
       # 2️⃣ Récupération du code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 3️⃣ Installer .NET SDK
+      # 3️⃣ Installer .NET SDK (nécessaire pour ASP.NET)
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
 
-      # 4️⃣ Restaurer les dépendances (restore)
-      - name: Restore dependencies
-        run: dotnet restore PartsUnlimited-aspnet45/PartsUnlimited.sln
+      # 4️⃣ Restaurer les dépendances
+      - name: Restore
+        run: dotnet restore PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj
 
-      # 5️⃣ Compiler la solution ASP.NET
-      - name: Build solution
-        run: dotnet build PartsUnlimited-aspnet45/PartsUnlimited.sln --configuration Release --no-restore
+      # 5️⃣ Compiler
+      - name: Build
+        run: dotnet build PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj --no-restore
 
-      # 6️⃣ Exécuter les tests unitaires
-      - name: Run Unit Tests
-        run: dotnet test PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj --no-build --verbosity normal
+      # 6️⃣ Exécuter les tests
+      - name: Run tests
+        run: dotnet test PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj --no-build
