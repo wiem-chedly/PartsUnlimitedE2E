@@ -1,35 +1,33 @@
-name: CI/CD Pipeline
+name: CI Pipeline ASP.NET
 
-# 1️⃣ Trigger : le pipeline se lance automatiquement sur push dans master
+# 1️⃣ Trigger : le pipeline se déclenche sur push dans master
 on:
   push:
     branches:
       - master
 
-# 2️⃣ Jobs
-name: CI/CD Pipeline
-
-# 1️⃣ Trigger : le pipeline se lance automatiquement sur push dans master
-on:
-  push:
-    branches:
-      - master
-
-# 2️⃣ Jobs
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest     # ⚠️ Projet ASP.NET 
     steps:
+      # 2️⃣ Récupération du code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js (exemple si c'est un projet Node.js)
-        uses: actions/setup-node@v3
+      # 3️⃣ Installer .NET SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          node-version: '16'
+          dotnet-version: '7.0.x'
 
-      - name: Install dependencies
-        run: npm install
+      # 4️⃣ Restaurer les dépendances (restore)
+      - name: Restore dependencies
+        run: dotnet restore PartsUnlimited-aspnet45/PartsUnlimited.sln
 
-      - name: Run tests
-        run: npm test
+      # 5️⃣ Compiler la solution ASP.NET
+      - name: Build solution
+        run: dotnet build PartsUnlimited-aspnet45/PartsUnlimited.sln --configuration Release --no-restore
+
+      # 6️⃣ Exécuter les tests unitaires
+      - name: Run Unit Tests
+        run: dotnet test PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj --no-build --verbosity normal
