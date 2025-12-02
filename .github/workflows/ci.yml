@@ -34,7 +34,7 @@ jobs:
   # Étape 2 : Build Docker + Push sur Docker Hub (Windows Container)
   build_and_push_docker:
     needs: build_and_test
-    runs-on: [self-hosted, windows]
+    runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
