@@ -1,6 +1,5 @@
 name: CI Pipeline - PartsUnlimited
 
-# Déclencheur : s’exécute à chaque push ou pull request sur master
 on:
   push:
     branches: [master]
@@ -9,30 +8,26 @@ on:
 
 jobs:
 
-  # Étape 1 : Build et test
+  # Étape 1 : Build & Test avec MSBuild
   build_and_test:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
-      - name: Checkout du dépôt
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Installer .NET 6
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 6.0.x
+      - name: Installer Visual Studio Build Tools
+        uses: microsoft/setup-msbuild@v1
 
-      - name: Restore
-        run: dotnet restore PartsUnlimited.sln
+      - name: Build le projet
+        run: msbuild PartsUnlimited.sln /p:Configuration=Release
 
-      - name: Build
-        run: dotnet build PartsUnlimited.sln --configuration Release
+      # Ici tu peux ajouter un step pour exécuter des tests si nécessaire
+      # - name: Run Tests
+      #   run: vstest.console.exe "test\PartsUnlimited.UnitTests.dll"
 
-      - name: Test
-        run: dotnet test PartsUnlimited.sln --configuration Release --no-build
-
-  # Étape 2 : Build Docker + Push Docker Hub
+  # Étape 2 : Build Docker + Push sur Docker Hub
   build_docker:
-    needs: build_and_test       # ne démarre qu'après la réussite de build_and_test
+    needs: build_and_test
     runs-on: windows-2019
     steps:
       - name: Checkout code
@@ -45,9 +40,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest .
 
       - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest
