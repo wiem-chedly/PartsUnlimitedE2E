@@ -1,9 +1,5 @@
 name: CI Pipeline - PartsUnlimited
 
-# -------------------------------------------------------------------
-# Déclencheur du pipeline : s’exécute à chaque push ou pull request 
-# sur la branche master (comme demandé dans l'énoncé).
-# -------------------------------------------------------------------
 on:
   push:
     branches:
@@ -14,7 +10,7 @@ on:
 
 jobs:
   # ---------------------------------------------------------------
-  # Petit job placeholder juste pour respecter la structure du lab.
+  # Job placeholder
   # ---------------------------------------------------------------
   placeholder:
     runs-on: windows-latest
@@ -22,50 +18,49 @@ jobs:
       - name: Trigger OK
         run: echo "Pipeline démarré 🚀"
 
- 
-  #  ÉTAPE 1 : BUILD
- 
+  # ---------------------------------------------------------------
+  # Étape 1 : Build
+  # ---------------------------------------------------------------
   build_and_test:
     runs-on: windows-latest
-
     steps:
-      
-      # Étape 1.1 : Récupérer le code source depuis GitHub
-      
-      - name: Étape 1.1 - Checkout du dépôt
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      
-      # Étape 1.2 : Installer le SDK .NET 6 (PartsUnlimited utilise .NET 6)
- 
-      - name: Étape 1.2 - Installer .NET 6
+      - name: Installer .NET 6
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
-      
-      # Étape 1.3 : Restaurer les dépendances NuGet
-      # -----------------------------------------------------------
-      - name: Étape 1.3 - Restore
+      - name: Restore
         run: dotnet restore PartsUnlimited.sln
 
-      # -----------------------------------------------------------
-      # Étape 1.4 : Build du projet (compilation)
-      # -----------------------------------------------------------
-      - name: Étape 1.4 - Build
+      - name: Build
         run: dotnet build PartsUnlimited.sln --configuration Release
 
-      # ===========================================================
-      #  ÉTAPE 2 : TEST
-      # ===========================================================
-
-      # -----------------------------------------------------------
-      # Étape 2.1 : Exécuter les tests automatiques (unitaires)
-      # -----------------------------------------------------------
-      - name: Étape 2.1 - Tests
+      - name: Tests
         run: dotnet test PartsUnlimited.sln --configuration Release --no-build
 
+  # ---------------------------------------------------------------
+  # Étape 3 : Build Docker + Push Docker Hub
+  # ---------------------------------------------------------------
+  build_docker:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest .
 
-  
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest
