@@ -10,14 +10,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Récupérer le code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Compiler la solution avec MSBuild
       - name: Build solution
-        run: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" PartsUnlimited-aspnet45\PartsUnlimited.sln /p:Configuration=Release'
+        run: '"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" PartsUnlimited-aspnet45\PartsUnlimited.sln /p:Configuration=Release'
 
-      # 3️⃣ Exécuter les tests unitaires
       - name: Run Unit Tests
-        run: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\Extensions\TestPlatform\VSTest.Console.exe" PartsUnlimited-aspnet45\test\PartsUnlimited.UnitTests\PartsUnlimited.UnitTests.csproj'
+        run: '"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\Extensions\TestPlatform\VSTest.Console.exe" PartsUnlimited-aspnet45\test\PartsUnlimited.UnitTests\PartsUnlimited.UnitTests.csproj'
