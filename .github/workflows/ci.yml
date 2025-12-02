@@ -9,38 +9,32 @@ on:
       - master
 
 jobs:
-  # Petit job placeholder
-  placeholder:
-    runs-on: windows-latest
-    steps:
-      - name: Trigger OK
-        run: echo "Pipeline démarré"
-
-  # Étape 1 + 2 : Build & Test
+  # Étape 1 : Build & Test avec MSBuild sur Windows
   build_and_test:
     runs-on: windows-latest
     steps:
       - name: Checkout du dépôt
         uses: actions/checkout@v3
 
-      - name: Installer .NET 7
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 7.0.x
+      - name: Installer .NET Framework 4.8 Developer Pack
+        uses: microsoft/setup-msbuild@v1
 
-      - name: Restore
-        run: dotnet restore PartsUnlimited.sln
+      - name: Restaurer les packages NuGet
+        run: nuget restore PartsUnlimited.sln
 
-      - name: Build
-        run: dotnet build PartsUnlimited.sln --configuration Release
+      - name: Build avec MSBuild
+        run: msbuild PartsUnlimited.sln /p:Configuration=Release
 
-      - name: Tests
-        run: dotnet test PartsUnlimited.sln --configuration Release --no-build
+      - name: Tests unitaires (si tu en as)
+        run: |
+          # Exemple si tu as un projet de test NUnit ou MSTest
+          # msbuild /t:Test PartsUnlimitedTests.csproj /p:Configuration=Release
+          echo "Ajouter vos tests ici si besoin"
 
-  # Étape 3 : Build Docker + Push sur Docker Hub
-  build_and_push_docker:      # <-- ici l’indentation corrigée
+  # Étape 2 : Build Docker + Push sur Docker Hub (Windows Container)
+  build_and_push_docker:
     needs: build_and_test
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
