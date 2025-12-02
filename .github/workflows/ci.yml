@@ -27,30 +27,28 @@ jobs:
 
       - name: Tests unitaires (si tu en as)
         run: |
-          # Exemple si tu as un projet de test NUnit ou MSTest
-          # msbuild /t:Test PartsUnlimitedTests.csproj /p:Configuration=Release
           echo "Ajouter vos tests ici si besoin"
 
-  # Étape 2 : Build Docker + Push sur Docker Hub (Windows Container)
+  # Étape 2 : Build Docker + Push sur Docker Hub (Ubuntu)
   build:
-  needs: test
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    needs: build_and_test       # <- doit correspondre au nom du job précédent
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: wiemchedly
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: wiemchedly
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build Docker image
-      run: |
-        docker build -t wiemchedly/my-app:${{ github.sha }} .
-        docker tag wiemchedly/my-app:${{ github.sha }} wiemchedly/my-app:latest
+      - name: Build Docker image
+        run: |
+          docker build -t wiemchedly/my-app:${{ github.sha }} .
+          docker tag wiemchedly/my-app:${{ github.sha }} wiemchedly/my-app:latest
 
-    - name: Push Docker image
-      run: |
-        docker push wiemchedly/my-app:${{ github.sha }}
-        docker push wiemchedly/my-app:latest
+      - name: Push Docker image
+        run: |
+          docker push wiemchedly/my-app:${{ github.sha }}
+          docker push wiemchedly/my-app:latest
