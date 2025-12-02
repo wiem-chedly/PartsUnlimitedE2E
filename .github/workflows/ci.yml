@@ -1,6 +1,5 @@
 name: CI Pipeline ASP.NET
 
-# 🔔 Trigger : lancement automatique sur push dans master
 on:
   push:
     branches:
@@ -8,26 +7,17 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest  # Windows pour ASP.NET
+    runs-on: windows-latest  # Windows pour ASP.NET classique
+
     steps:
-      # 1️⃣ Récupérer le code du dépôt
+      # 1️⃣ Récupérer le code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Installer le SDK .NET
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-
-      # 3️⃣ Restaurer les dépendances de la solution
-      - name: Restore dependencies
-        run: dotnet restore PartsUnlimited-aspnet45/PartsUnlimited.sln
-
-      # 4️⃣ Compiler la solution en Release
+      # 2️⃣ Compiler la solution avec MSBuild
       - name: Build solution
-        run: dotnet build PartsUnlimited-aspnet45/PartsUnlimited.sln --configuration Release --no-restore
+        run: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" PartsUnlimited-aspnet45\PartsUnlimited.sln /p:Configuration=Release'
 
-      # 5️⃣ Exécuter les tests unitaires
+      # 3️⃣ Exécuter les tests unitaires
       - name: Run Unit Tests
-        run: dotnet test PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj --no-build --verbosity normal
+        run: '"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\IDE\Extensions\TestPlatform\VSTest.Console.exe" PartsUnlimited-aspnet45\test\PartsUnlimited.UnitTests\PartsUnlimited.UnitTests.csproj'
