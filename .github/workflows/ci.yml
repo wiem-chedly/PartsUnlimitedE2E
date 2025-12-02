@@ -1,31 +1,72 @@
-name: CI Pipeline - Test, Build, Push Docker
+name: CI Pipeline - PartsUnlimited
 
+# Déclencheur du pipeline : s’exécute à chaque push ou pull request 
+# sur la branche master (comme demandé dans l'énoncé).
 on:
   push:
     branches:
-      - main
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
-  test:
-    name: Test
-    runs-on: ubuntu-latest
+  # Petit job placeholder juste pour respecter la structure du lab.
+  placeholder:
+    runs-on: windows-latest
     steps:
-      - name: Checkout code
+      - name: Trigger OK
+        run: echo "Pipeline démarré "
+
+ 
+  #  ÉTAPE 1 : BUILD
+ 
+  build_and_test:
+    runs-on: windows-latest
+
+    steps:
+      
+      # Étape 1.1 : Récupérer le code source depuis GitHub
+      
+      - name: Étape 1.1 - Checkout du dépôt
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: echo "Pas de tests pour ce projet"  # tu peux supprimer si tu as des tests
+      
+      # Étape 1.2 : Installer le SDK .NET 6 (PartsUnlimited utilise .NET 6)
+ 
+      - name: Étape 1.2 - Installer .NET 6
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 6.0.x
 
-  build:
-    name: Build & Push Docker Image
+      
+      # Étape 1.3 : Restaurer les dépendances NuGet
+      
+      - name: Étape 1.3 - Restore
+        run: dotnet restore PartsUnlimited.sln
+
+      
+      # Étape 1.4 : Build du projet (compilation)
+      - name: Étape 1.4 - Build
+        run: dotnet build PartsUnlimited.sln --configuration Release
+
+      
+      #  ÉTAPE 2 : TEST
+      
+      # Étape 2.1 : Exécuter les tests automatiques (unitaires)
+     
+      - name: Étape 2.1 - Tests
+        run: dotnet test PartsUnlimited.sln --configuration Release --no-build
+
+
+  # Étape 3 : Build Docker + Push sur Docker Hub
+     build-and-push-docker:
     needs: test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -33,11 +74,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: |
-            wiemchedly/partsunlimited:latest
-            wiemchedly/partsunlimited:${{ github.sha }}
+      - name: Build Docker image
+        run: |
+          docker build -t wiemchedly/partsunlimited:${{ github.sha }} .
+          docker tag wiemchedly/partsunlimited:${{ github.sha }} wiemchedly/partsunlimited:latest
+
+      - name: Push Docker image
+        run: |
+          docker push wiemchedly/partsunlimited:${{ github.sha }}
+          docker push wiemchedly/partsunlimited:latest

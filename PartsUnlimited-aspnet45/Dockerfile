@@ -1,16 +1,20 @@
-# ===========================================================
-# Dockerfile pour PartsUnlimited
-# ===========================================================
-
-# Étape 1 : Build de l'application
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY . .
-RUN dotnet restore PartsUnlimited.sln
-RUN dotnet publish PartsUnlimited.sln -c Release -o /app/publish
-
-# Étape 2 : Image finale (runtime)
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
+# Étape 1 : Build du projet .NET
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
-COPY --from=build /app/publish .
-ENTRYPOINT ["dotnet", "PartsUnlimitedWeb.dll"]
+
+# Copier le code
+COPY . .
+
+# Restaurer et compiler
+RUN dotnet restore
+RUN dotnet publish -c Release -o /out
+
+# Étape 2 : Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+
+COPY --from=build /out .
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "PartsUnlimited.dll"]
