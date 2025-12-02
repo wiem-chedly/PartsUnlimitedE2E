@@ -1,13 +1,39 @@
-name: CI/CD Pipeline
+name: CI Pipeline - PartsUnlimited
 
 on:
   push:
     branches:
-      - master      # Le pipeline se déclenche à chaque push sur la branche master
+      - master
 
 jobs:
+
+  # Étape 1 : Vérifier que le pipeline se déclenche
   placeholder:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-      - name: Vérification du déclenchement
-        run: echo "Trigger fonctionne "
+      - name: Trigger OK
+        run: echo "Pipeline démarré 🚀"
+
+  # Étape 2 : Build & Test
+  build_and_test:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
+
+      - name: Setup VSTest
+        uses: microsoft/setup-vstest@v1
+
+      - name: Restore NuGet packages
+        run: nuget restore PartsUnlimited.sln
+
+      - name: Build the solution
+        run: msbuild PartsUnlimited.sln /p:Configuration=Release
+
+      - name: Run tests
+        run: |
+          vstest.console.exe **\bin\Release\*test*.dll
