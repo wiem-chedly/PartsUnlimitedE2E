@@ -60,7 +60,6 @@ jobs:
 
 
    # Étape 3 : Build Docker + Push Docker Hub
-  # ---------------------------------------------------------------
   build_docker:
   needs: build_and_test
   runs-on: ubuntu-latest
