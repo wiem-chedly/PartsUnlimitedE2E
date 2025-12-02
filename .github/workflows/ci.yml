@@ -29,10 +29,10 @@ jobs:
         run: |
           echo "Ajouter vos tests ici si besoin"
 
-  # Étape 2 : Build Docker + Push sur Docker Hub (Ubuntu)
-  build:
-    needs: build_and_test       # <- doit correspondre au nom du job précédent
-    runs-on: ubuntu-latest
+  # Étape 2 : Build Docker + Push sur Docker Hub (Windows Container)
+  build_docker:
+    needs: build_and_test
+    runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
