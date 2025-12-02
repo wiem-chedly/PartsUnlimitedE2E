@@ -29,10 +29,10 @@ jobs:
         run: |
           echo "Ajouter vos tests ici si besoin"
 
-  # Étape 2 : Build Docker + Push sur Docker Hub (Windows Container)
+  # Étape 2 : Build Docker + Push sur Docker Hub (Linux Container)
   build_docker:
     needs: build_and_test
-    runs-on: windows-latest
+    runs-on: ubuntu-latest   # <- Linux runner pour Docker Linux
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

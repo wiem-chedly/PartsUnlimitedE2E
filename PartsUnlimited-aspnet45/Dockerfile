@@ -1,5 +1,5 @@
-FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
 WORKDIR /app
 COPY . .
-RUN msbuild PartsUnlimited.sln /p:Configuration=Release
-CMD ["PartsUnlimited.exe"]
+RUN dotnet build
+CMD ["dotnet", "run"]
