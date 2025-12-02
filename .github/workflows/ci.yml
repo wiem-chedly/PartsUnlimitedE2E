@@ -60,14 +60,21 @@ jobs:
 
 
   # Étape 3 : Build Docker + Push Docker Hub sur Linux (GitHub runner)
+  name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [master]
+
+jobs:
   build_docker:
-    needs: build_and_test
-    runs-on: ubuntu-latest
+    runs-on: windows-2019
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Login Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
@@ -75,10 +82,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd PartsUnlimited-aspnet45
           docker build -t ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest .
 
       - name: Push Docker image
         run: |
-          cd PartsUnlimited-aspnet45
           docker push ${{ secrets.DOCKER_USERNAME }}/partsunlimited:latest
