@@ -1,6 +1,6 @@
 name: CI Pipeline ASP.NET
 
-# 1️⃣ Trigger : le pipeline se déclenche sur push dans master
+# 🔔 Trigger : lancement automatique sur push dans master
 on:
   push:
     branches:
@@ -8,26 +8,26 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest     # ⚠️ Projet ASP.NET 
+    runs-on: windows-latest  # Windows pour ASP.NET
     steps:
-      # 2️⃣ Récupération du code
+      # 1️⃣ Récupérer le code du dépôt
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 3️⃣ Installer .NET SDK
+      # 2️⃣ Installer le SDK .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '7.0.x'
 
-      # 4️⃣ Restaurer les dépendances (restore)
+      # 3️⃣ Restaurer les dépendances de la solution
       - name: Restore dependencies
         run: dotnet restore PartsUnlimited-aspnet45/PartsUnlimited.sln
 
-      # 5️⃣ Compiler la solution ASP.NET
+      # 4️⃣ Compiler la solution en Release
       - name: Build solution
         run: dotnet build PartsUnlimited-aspnet45/PartsUnlimited.sln --configuration Release --no-restore
 
-      # 6️⃣ Exécuter les tests unitaires
+      # 5️⃣ Exécuter les tests unitaires
       - name: Run Unit Tests
         run: dotnet test PartsUnlimited-aspnet45/test/PartsUnlimited.UnitTests/PartsUnlimited.UnitTests.csproj --no-build --verbosity normal
