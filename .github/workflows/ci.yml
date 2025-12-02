@@ -38,7 +38,7 @@ jobs:
         run: dotnet test PartsUnlimited.sln --configuration Release --no-build
 
   # Étape 3 : Build Docker + Push sur Docker Hub
-  build-and-push-docker:
+build-and-push-docker:
   needs: build_and_test
   runs-on: ubuntu-latest
   steps:
