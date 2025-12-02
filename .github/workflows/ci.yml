@@ -10,38 +10,39 @@ on:
 
 jobs:
 
+  # Placeholder (optionnel)
   placeholder:
     runs-on: windows-latest
     steps:
       - name: Trigger OK
         run: echo "Pipeline démarré"
 
+  # Étape 1 & 2 : Build + Test
   build_and_test:
     runs-on: windows-latest
     steps:
 
-      - name: Étape 1.1 - Checkout du dépôt
+      - name: Checkout du dépôt
         uses: actions/checkout@v3
 
-      - name: Étape 1.2 - Installer .NET 6
+      - name: Installer .NET 6
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
-      - name: Étape 1.3 - Restore
+      - name: Restore
         run: dotnet restore PartsUnlimited.sln
 
-      - name: Étape 1.4 - Build
+      - name: Build
         run: dotnet build PartsUnlimited.sln --configuration Release
 
-      - name: Étape 2.1 - Tests
+      - name: Tests
         run: dotnet test PartsUnlimited.sln --configuration Release --no-build
 
-
+  # Étape 3 : Build Docker + Push Docker Hub
   build_docker:
     needs: build_and_test
-    runs-on: windows-latest
-
+    runs-on: ubuntu-latest     # OBLIGATOIRE pour Docker !!!
     steps:
 
       - name: Checkout code
