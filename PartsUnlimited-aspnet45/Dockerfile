@@ -1,13 +1,5 @@
-# Étape build
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8
 WORKDIR /app
 COPY . .
-RUN dotnet restore
-RUN dotnet publish -c Release -o /out
-
-# Étape runtime
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
-WORKDIR /app
-COPY --from=build /out .
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "PartsUnlimited.dll"]
+RUN msbuild PartsUnlimited.sln /p:Configuration=Release
+CMD ["PartsUnlimited.exe"]
