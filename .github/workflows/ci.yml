@@ -1,4 +1,4 @@
-name: CI Pipeline - PartsUnlimited
+name: CI/CD - PartsUnlimitedWeb
 
 on:
   push:
@@ -10,45 +10,39 @@ on:
 
 jobs:
 
-  placeholder:
-    runs-on: windows-latest
-    steps:
-      - name: Trigger OK
-        run: echo "Pipeline démarré"
-
   # --------------------------------------------------------
-  # JOB 1 : BUILD + TEST .NET 6
+  # JOB 1 : Build & Test .NET 6
   # --------------------------------------------------------
   build_and_test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout du dépôt
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Installer .NET 6
+      - name: Setup .NET 6
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
 
-      - name: Restaurer les dépendances
-        run: dotnet restore PartsUnlimited.sln
+      - name: Restore dependencies
+        run: dotnet restore PartsUnlimitedWeb/PartsUnlimitedWeb.csproj
 
-      - name: Build du projet
-        run: dotnet build PartsUnlimited.sln --configuration Release
+      - name: Build project
+        run: dotnet build PartsUnlimitedWeb/PartsUnlimitedWeb.csproj --configuration Release
 
-      - name: Lancer les tests
-        run: dotnet test PartsUnlimited.sln --configuration Release --no-build
+      - name: Run tests
+        run: dotnet test PartsUnlimitedWeb/PartsUnlimitedWeb.csproj --no-build --configuration Release
 
   # --------------------------------------------------------
-  # JOB 2 : BUILD & PUSH DOCKER IMAGE
+  # JOB 2 : Build & Push Docker Image
   # --------------------------------------------------------
   docker_build:
-    needs: build_and_test   # L'étape Docker commence après les tests
+    needs: build_and_test
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Login to Docker Hub
@@ -59,8 +53,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t wiemchedly/partsunlimited:latest \
-            -f PartsUnlimited-aspnet45/Dockerfile .
+          docker build -t wiemchedly/partsunlimited:latest -f PartsUnlimitedWeb/Dockerfile .
 
       - name: Push Docker image
         run: |
