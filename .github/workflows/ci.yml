@@ -11,7 +11,7 @@ on:
 jobs:
 
   # -------------------------------------------------------------
-  # JOB 1 : Build & Test (validation du code)
+  # JOB 1 : Build & Test
   # -------------------------------------------------------------
   build_and_test:
     runs-on: windows-latest
@@ -37,8 +37,7 @@ jobs:
 
 
   # -------------------------------------------------------------
-  # JOB 2 : Build Docker (Windows) + Push Docker Hub
-  # Solution SIMPLE : recompiler pour obtenir PartsUnlimitedWeb/
+  # JOB 2 : Build Docker + Push Docker Hub
   # -------------------------------------------------------------
   docker_build:
     needs: build_and_test
@@ -66,9 +65,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # 🔥 CORRECTION ICI : on précise le chemin du Dockerfile
       - name: Build image Docker Windows
         run: |
-          docker build -t wiemchedly/partsunlimited:${{ github.sha }} .
+          docker build -t wiemchedly/partsunlimited:${{ github.sha }} -f PartsUnlimited-aspnet45/Dockerfile .
           docker tag wiemchedly/partsunlimited:${{ github.sha }} wiemchedly/partsunlimited:latest
 
       - name: Push image to Docker Hub
