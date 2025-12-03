@@ -13,33 +13,7 @@ jobs:
   # -------------------------------------------------------------
   # JOB 1 : Build & Test
   # -------------------------------------------------------------
-  build_and_test:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout du dépôt
-        uses: actions/checkout@v3
-
-      - name: Installer MSBuild
-        uses: microsoft/setup-msbuild@v1.1
-
-      - name: Restaurer les packages NuGet
-        run: nuget restore PartsUnlimited.sln
-
-      - name: Build du projet
-        run: msbuild PartsUnlimited.sln /p:Configuration=Release
-
-      - name: Vérifier sortie du build
-        run: dir PartsUnlimitedWeb
-
-      - name: Tests (Placeholder)
-        run: echo "Pas de tests pour ASP.NET 4.5"
-
-
-  # -------------------------------------------------------------
-  # JOB 2 : Build Docker + Push Docker Hub
-  # -------------------------------------------------------------
-  build_docker:
+ build_docker:
   needs: build_and_test
   runs-on: ubuntu-latest
 
