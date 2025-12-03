@@ -10,51 +10,25 @@ on:
 
 jobs:
 
-  # --------------------------------------------------------
-  # JOB 1 : Build & Test .NET 6
-  # --------------------------------------------------------
   build_and_test:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup .NET 6
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 6.0.x
+      - run: dotnet restore PartsUnlimitedWeb/PartsUnlimitedWeb.csproj
+      - run: dotnet build PartsUnlimitedWeb/PartsUnlimitedWeb.csproj --configuration Release
+      - run: dotnet test PartsUnlimitedWeb/PartsUnlimitedWeb.csproj --no-build --configuration Release
 
-      - name: Restore dependencies
-        run: dotnet restore PartsUnlimitedWeb/PartsUnlimitedWeb.csproj
-
-      - name: Build project
-        run: dotnet build PartsUnlimitedWeb/PartsUnlimitedWeb.csproj --configuration Release
-
-      - name: Run tests
-        run: dotnet test PartsUnlimitedWeb/PartsUnlimitedWeb.csproj --no-build --configuration Release
-
-  # --------------------------------------------------------
-  # JOB 2 : Build & Push Docker Image
-  # --------------------------------------------------------
   docker_build:
     needs: build_and_test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build Docker image
-        run: |
-          docker build -t wiemchedly/partsunlimited:latest -f PartsUnlimitedWeb/Dockerfile .
-
-      - name: Push Docker image
-        run: |
-          docker push wiemchedly/partsunlimited:latest
+      - run: docker build -t wiemchedly/partsunlimited:latest -f PartsUnlimitedWeb/Dockerfile .
+      - run: docker push wiemchedly/partsunlimited:latest
