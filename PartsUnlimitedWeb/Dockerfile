@@ -7,13 +7,13 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
-# Copier les fichiers csproj et restaurer les dépendances
-COPY ["PartsUnlimitedWeb.csproj", "./"]
-RUN dotnet restore "PartsUnlimitedWeb.csproj"
+# Copier le csproj et restaurer les dépendances
+COPY PartsUnlimitedWeb/PartsUnlimitedWeb.csproj ./
+RUN dotnet restore PartsUnlimitedWeb.csproj
 
 # Copier tout le projet et build
-COPY . .
-RUN dotnet publish "PartsUnlimitedWeb.csproj" -c Release -o /app/published
+COPY PartsUnlimitedWeb/. ./
+RUN dotnet publish PartsUnlimitedWeb.csproj -c Release -o /app/published
 
 # 3. Construire l'image finale
 FROM base AS final
