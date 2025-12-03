@@ -1,12 +1,9 @@
-# Étape 1 : Base Linux .NET 7
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
-WORKDIR /app
+# Image de base pour ASP.NET 4.5
+FROM mcr.microsoft.com/dotnet/framework/aspnet:4.8-windowsservercore-ltsc2019
 
-# Copier tous les fichiers du projet
-COPY . .
+# Copier les fichiers de ton projet buildés
+WORKDIR /inetpub/wwwroot
+COPY ./PartsUnlimited/ ./
 
-# Construire le projet
-RUN dotnet build
-
-# Commande pour lancer l'application
-CMD ["dotnet", "run"]
+# Exposer le port IIS
+EXPOSE 80
