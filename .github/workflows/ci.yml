@@ -9,14 +9,18 @@ on:
       - master
 
 jobs:
-  # Étape 1 : Build & Test sur Windows (MSBuild .NET Framework)
+
+  # ===========================
+  # ÉTAPE 1 : BUILD & TEST
+  # ===========================
   build_and_test:
     runs-on: windows-latest
+
     steps:
       - name: Checkout du dépôt
         uses: actions/checkout@v3
 
-      - name: Installer .NET Framework 4.8 Developer Pack
+      - name: Installer MSBuild (pour .NET Framework)
         uses: microsoft/setup-msbuild@v1
 
       - name: Restaurer les packages NuGet
@@ -25,33 +29,29 @@ jobs:
       - name: Build avec MSBuild
         run: msbuild PartsUnlimited.sln /p:Configuration=Release
 
-      - name: Tests unitaires (si tu en as)
-        run: |
-          echo "Ajouter vos tests ici si besoin"
+      - name: Tests unitaires
+        run: echo "Aucun test configuré"
 
-  # Étape 2 : Build Docker Linux + Push sur Docker Hub
-    docker_build_push:
-    needs: build_and_test   # Cette étape démarre après la réussite des tests
-    runs-on: windows-latest
+
+  # ===========================
+  # ÉTAPE 2 : DOCKER BUILD + PUSH
+  # ===========================
+  docker_build_push:
+    needs: build_and_test
+    runs-on: ubuntu-latest   # DOIT être linux pour docker
 
     steps:
-      # 3.1 Récupérer le code source
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 3.2 Connexion à Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3.3 Build de l'image Docker
       - name: Build Docker image
-        run: |
-          docker build -t wiemchedly/partsunlimited:latest .
+        run: docker build -t wiemchedly/partsunlimited:latest .
 
-      # 3.4 Push de l'image Docker sur Docker Hub
       - name: Push Docker image
-        run: |
-          docker push wiemchedly/partsunlimited:latest
+        run: docker push wiemchedly/partsunlimited:latest
