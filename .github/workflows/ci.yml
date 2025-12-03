@@ -1,33 +1,77 @@
-name: CI Pipeline
+name: CI Pipeline - PartsUnlimited ASP.NET 4.5
 
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
+
+  # -------------------------------------------------------------
+  # JOB 1 : Build & Test (validation du code)
+  # -------------------------------------------------------------
   build_and_test:
     runs-on: windows-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout du dépôt
+        uses: actions/checkout@v3
 
-      - uses: microsoft/setup-msbuild@v1
+      - name: Installer MSBuild
+        uses: microsoft/setup-msbuild@v1.1
 
-      - run: nuget restore PartsUnlimited.sln
+      - name: Restaurer les packages NuGet
+        run: nuget restore PartsUnlimited.sln
 
-      - run: msbuild PartsUnlimited.sln /p:Configuration=Release
+      - name: Build du projet
+        run: msbuild PartsUnlimited.sln /p:Configuration=Release
 
-  docker_build_push:
+      - name: Vérifier sortie du build
+        run: dir PartsUnlimitedWeb
+
+      - name: Tests (Placeholder)
+        run: echo "Pas de tests pour ASP.NET 4.5"
+
+
+  # -------------------------------------------------------------
+  # JOB 2 : Build Docker (Windows) + Push Docker Hub
+  # Solution SIMPLE : recompiler pour obtenir PartsUnlimitedWeb/
+  # -------------------------------------------------------------
+  docker_build:
     needs: build_and_test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+    runs-on: windows-latest
 
-      - uses: docker/login-action@v3
+    steps:
+      - name: Checkout du dépôt
+        uses: actions/checkout@v3
+
+      - name: Installer MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Restaurer NuGet
+        run: nuget restore PartsUnlimited.sln
+
+      - name: Rebuild du projet (IMPORTANT pour Docker)
+        run: msbuild PartsUnlimited.sln /p:Configuration=Release
+
+      - name: Vérifier sortie du build pour Docker
+        run: dir PartsUnlimitedWeb
+
+      - name: Login Docker Hub
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - run: docker build -t wiemchedly/partsunlimited:latest .
+      - name: Build image Docker Windows
+        run: |
+          docker build -t wiemchedly/partsunlimited:${{ github.sha }} .
+          docker tag wiemchedly/partsunlimited:${{ github.sha }} wiemchedly/partsunlimited:latest
 
-      - run: docker push wiemchedly/partsunlimited:latest
+      - name: Push image to Docker Hub
+        run: |
+          docker push wiemchedly/partsunlimited:${{ github.sha }}
+          docker push wiemchedly/partsunlimited:latest
