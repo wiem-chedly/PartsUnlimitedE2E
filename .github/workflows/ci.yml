@@ -1,49 +1,33 @@
-name: CI Pipeline - PartsUnlimited
+name: CI Pipeline
 
 on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
-  # Étape 1 : Build & Test Windows
   build_and_test:
     runs-on: windows-latest
     steps:
-      - name: Checkout du dépôt
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Installer .NET Framework 4.8 Developer Pack
-        uses: microsoft/setup-msbuild@v1
+      - uses: microsoft/setup-msbuild@v1
 
-      - name: Restaurer les packages NuGet
-        run: nuget restore PartsUnlimited.sln
+      - run: nuget restore PartsUnlimited.sln
 
-      - name: Build avec MSBuild
-        run: msbuild PartsUnlimited.sln /p:Configuration=Release
+      - run: msbuild PartsUnlimited.sln /p:Configuration=Release
 
-      - name: Tests unitaires
-        run: echo "Ajouter vos tests ici"
-
-  # Étape 2 : Build Docker + Push (Linux)
   docker_build_push:
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image
-        run: docker build -t wiemchedly/partsunlimited:latest .
+      - run: docker build -t wiemchedly/partsunlimited:latest .
 
-      - name: Push Docker image
-        run: docker push wiemchedly/partsunlimited:latest
+      - run: docker push wiemchedly/partsunlimited:latest
