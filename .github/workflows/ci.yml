@@ -9,18 +9,14 @@ on:
       - master
 
 jobs:
-
-  # ===========================
-  # ÉTAPE 1 : BUILD & TEST
-  # ===========================
+  # Étape 1 : Build & Test Windows
   build_and_test:
     runs-on: windows-latest
-
     steps:
       - name: Checkout du dépôt
         uses: actions/checkout@v3
 
-      - name: Installer MSBuild (pour .NET Framework)
+      - name: Installer .NET Framework 4.8 Developer Pack
         uses: microsoft/setup-msbuild@v1
 
       - name: Restaurer les packages NuGet
@@ -30,22 +26,18 @@ jobs:
         run: msbuild PartsUnlimited.sln /p:Configuration=Release
 
       - name: Tests unitaires
-        run: echo "Aucun test configuré"
+        run: echo "Ajouter vos tests ici"
 
-
-  # ===========================
-  # ÉTAPE 2 : DOCKER BUILD + PUSH
-  # ===========================
+  # Étape 2 : Build Docker + Push (Linux)
   docker_build_push:
     needs: build_and_test
-    runs-on: ubuntu-latest   # DOIT être linux pour docker
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
