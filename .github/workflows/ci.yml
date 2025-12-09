@@ -1,4 +1,3 @@
-
 name: CI/CD - PartsUnlimitedWeb
 
 on:
@@ -33,11 +32,12 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - run: docker build -t wiemchedly/partsunlimited:latest -f PartsUnlimitedWeb/Dockerfile .
       - run: docker push wiemchedly/partsunlimited:latest
-deploy_notification:
-  needs: docker_build
-  runs-on: ubuntu-latest
-  steps:
-    - name: Notify deployment
-      run: |
-        echo "L'image Docker a été poussée sur Docker Hub"
-        echo "Déployer manuellement sur Azure Web App : https://partsunlimited-webapp-gwguhzdrf3e7cpfn.azurewebsites.net"
+
+  deploy_notification:
+    needs: docker_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify deployment
+        run: |
+          echo "L'image Docker a été poussée sur Docker Hub"
+          echo "Déployer manuellement sur Azure Web App : https://partsunlimited-webapp-gwguhzdrf3e7cpfn.azurewebsites.net"
