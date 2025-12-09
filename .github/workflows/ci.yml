@@ -1,4 +1,3 @@
-
 name: CI/CD - PartsUnlimitedWeb
 
 on:
@@ -34,22 +33,22 @@ jobs:
       - run: docker build -t wiemchedly/partsunlimited:latest -f PartsUnlimitedWeb/Dockerfile .
       - run: docker push wiemchedly/partsunlimited:latest
 
-deploy:
-  needs: build          # démarre après le job "build"
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+  deploy:
+    needs: docker_build      # démarrer après le job "docker_build"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Deploy to Azure Web App (using publish profile)
-      uses: azure/webapps-deploy@v2
-      with:
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        app-name: 'partsunlimited-webapp'
-        images: 'wiemchedly/partsunlimited:latest'
+      - name: Deploy to Azure Web App (using publish profile)
+        uses: azure/webapps-deploy@v2
+        with:
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          app-name: 'partsunlimited-webapp'
+          images: 'wiemchedly/partsunlimited:latest'
